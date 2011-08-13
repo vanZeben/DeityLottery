@@ -1,0 +1,17 @@
+lottery:
+    using_iconomy: true
+    using_permissions: true
+    ticket_price: 10
+    pot: 0
+    time: 16
+    max_tickets: 5
+    
+mysql:
+    server:
+        address: localhost
+        port: 8889
+        username: root
+        password: root
+    database:
+        name: kingdoms
+        table_prefix: lottery_

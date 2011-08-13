@@ -1,0 +1,17 @@
+name: Lottery
+main: com.imdeity.lottery.Lottery
+version: 0.0.1
+author: vanZeben
+website: www.imdeity.com
+
+commands:
+  lottery:
+        aliases: []
+  lotteryadmin:
+        aliases: [la]
+
+#  Possible permission nodes
+#
+#    lottery.general - provides access to all basic commands (help, buy, winners)
+#    lottery.admin - provides access to all admin commands (config, addtopot, removefrompot, draw)
+#
