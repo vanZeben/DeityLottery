@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -142,6 +143,25 @@ public class FileMgmt {
 		}
 	}
 
+	public static boolean stringToFile(String source, String FileName, boolean check) throws IOException {
+        
+        try {
+
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(FileName, true)));
+
+            source.replaceAll("\n", System.getProperty("line.separator"));
+
+            out.println(source);
+            out.close();
+            return true;
+
+        }
+        catch (IOException e)
+        {
+            System.out.println("Exception ");
+            return false;
+        }
+    }
 
 	// move a file to a sub directory
 	public static void moveFile(File sourceFile , String targetLocation) throws IOException {

@@ -120,7 +120,7 @@ public class Settings {
         config.save();
     }
     
-    private String getRootFolder() {
+    public String getRootFolder() {
         if (this != null)
             return plugin.getDataFolder().getPath();
         else
@@ -168,6 +168,10 @@ public class Settings {
     
     public static boolean isUsingPermissions() {
         return getBoolean("lottery.USING_PERMISSIONS");
+    }
+    
+    public static boolean isInDebug() {
+        return getBoolean("lottery.DEBUG_MODE");
     }
     
     public static int getExtraPot() {

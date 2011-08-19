@@ -39,8 +39,8 @@ public class LotteryObject {
       output = ChatTools.White + winner + ChatTools.LightGray + " won " + ChatTools.Yellow + winnings + ".00 Dei!";
        
       sql = "INSERT INTO  "+Settings.getMySQLWinnersTable()+" (" +
-              "`username`, `winnings`)" + "VALUES (" +
-              "'"+winner+"', '"+winnings+"');";
+              "`username`, `winnings`, `timestamp`)" + "VALUES (" +
+              "'"+winner+"', '"+winnings+"', NOW());";
       
       double money = winnings;
       iConomy.getAccount(winner).getHoldings().add(money);

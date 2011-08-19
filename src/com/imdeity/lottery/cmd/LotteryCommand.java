@@ -75,13 +75,13 @@ public class LotteryCommand implements CommandExecutor {
                 "'"+player.getName()+"');";
         double money = numTicket * Settings.getTicketPrice();
          
-        if (LotteryObject.isWinner(player.getName()))  {
-            plugin.sendPlayerMessage(player, ChatTools.Red+"You have won a lottery in the past 10 days.");
-            plugin.sendPlayerMessage(player, ChatTools.Red+"Don't be so greedy.");
-            return;
-        }
+//        if (LotteryObject.isWinner(player.getName()))  {
+//            plugin.sendPlayerMessage(player, ChatTools.Red+"You have won a lottery in the past 10 days.");
+//            plugin.sendPlayerMessage(player, ChatTools.Red+"Don't be so greedy.");
+//            return;
+//        }
         
-        if (numTicket > Settings.getMaxTickets() || (LotteryObject.getNumTickets(player.getName())+numTicket) >= Settings.getMaxTickets()) {
+        if ((LotteryObject.getNumTickets(player.getName())+numTicket) > Settings.getMaxTickets()) {
             plugin.sendPlayerMessage(player, ChatTools.Red+"You can only have a maximum of "+Settings.getMaxTickets()+" Tickets.");
             return;
         }
@@ -99,7 +99,7 @@ public class LotteryCommand implements CommandExecutor {
 
     public void winnersCommand(Player player, String[] split) {
         ArrayList<String> winners = LotteryObject.getWinners();
-        player.sendMessage(ChatTools.formatTitle("Auction Winners"));
+        player.sendMessage(ChatTools.formatTitle("Lottery Winners"));
         for (String s : winners) {
             plugin.sendPlayerMessage(player, s);
         }

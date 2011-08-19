@@ -50,6 +50,7 @@ public class MySQL {
 				"`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"+
 		        "`username` VARCHAR( 16 ) NOT NULL ,"+
 		        "`winnings` INT( 10 ) NOT NULL DEFAULT  '0' ,"+
+		        "`time` TIMESTAMP NOT NULL,"+
 		        "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 " +
 		        "COMMENT='Past Lottery winners.';");
 	}

@@ -1,9 +1,8 @@
 package com.imdeity.lottery;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
@@ -28,6 +27,7 @@ public class Lottery extends JavaPlugin {
     public static iConomy iconomy = null;
     public static MySQL database = null;
     public static Settings settings = null;
+    public static Settings debug = null;
     private static int taskId = -1;
     
     @Override
@@ -38,7 +38,7 @@ public class Lottery extends JavaPlugin {
         verifyDatabase();
         getCommand("lottery").setExecutor(new LotteryCommand(this));
         getCommand("lotteryadmin").setExecutor(new LotteryAdminCommand(this)); 
-        taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new printAnnounce(), 20*60*60, 20*60*60 );
+        taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Announce(), 0, 20*60*60 );
        out(this.getDescription().getVersion() + " Enabled.");
     
     }
@@ -51,6 +51,8 @@ public class Lottery extends JavaPlugin {
     
     private void loadSettings() {
         settings = new Settings(this);
+        debug = new Settings(this);
+        debug.loadSettings("debug.yml", "/debug.yml");
         settings.loadSettings("config.yml", "/config.yml");
     }
     
@@ -106,14 +108,48 @@ public class Lottery extends JavaPlugin {
             p.sendMessage(ChatTools.Gray + "[Lottery] " + message);
     }
     
-    class printAnnounce implements Runnable
-    {
-        public void run()
-        {
-            if (Calendar.getInstance(TimeZone.getTimeZone("GMT-5:00")).get(Calendar.HOUR_OF_DAY) == Settings.getTicketTime()) {
-               if (LotteryObject.getPot() != 0) {
+    class Announce implements Runnable {
+        public void run() {
+            String[] time = database.Read("SELECT NOW()").get(1).get(0).split(" ");
+            double currentTime = Double.parseDouble((time[1].split(":"))[2]);
+            boolean isValid = currentTime == Settings.getTicketTime();
+            
+            String[] lastTime = database.Read("SELECT * FROM "+Settings.getMySQLWinnersTable()+" ORDER BY `id` DESC LIMIT 1").get(1).get(3).split(" ");
+            int lastDraw = Integer.parseInt((lastTime[0].split("-"))[2]);
+            int currentDraw = Integer.parseInt((time[0].split("-"))[2]);
+            
+            if (Settings.isInDebug()) {
+                String output = "";
+                
+                if (LotteryObject.getPot() != 0 && isValid && (lastDraw < currentDraw)) {
                     sendNonFormattedGlobalMessage(ChatTools.formatTitle("Lottery"));
                     sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    output+= "Lottery Ran on time: " +  time[1] + "\n";
+                    output+= "lastDraw: " + lastDraw + "|" + "currentDraw " + currentDraw;
+                } else if (LotteryObject.getPot() != 0 &&lastDraw == currentDraw && isValid){
+                    output+= "Lottery already ran today: " + currentTime;
+                } else if (LotteryObject.getPot() != 0 && ((lastDraw+1) == currentDraw) && (currentTime>Settings.getTicketTime())){
+                    sendNonFormattedGlobalMessage(ChatTools.formatTitle("Lottery"));
+                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    output+= "Lottery was one day behind: " + time[1] + "\n";
+                    output+= "lastDraw: " + lastDraw + "|" + "currentDraw " + currentDraw;
+                } else {
+                    output = "Checking Lottery: " + time[1];
+                }
+                try {
+                    FileMgmt.stringToFile(output, settings.getRootFolder() + FileMgmt.fileSeparator() + "debug.yml", true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (LotteryObject.getPot() != 0 && isValid && (lastDraw < currentDraw)) {
+                    sendNonFormattedGlobalMessage(ChatTools.formatTitle("Lottery"));
+                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                } else if (LotteryObject.getPot() != 0 && ((lastDraw+1) == currentDraw) && (currentTime>Settings.getTicketTime())){
+                    sendNonFormattedGlobalMessage(ChatTools.formatTitle("Lottery"));
+                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                } else if (LotteryObject.getPot() != 0 && lastDraw == currentDraw && isValid){
+                    out("Already ran today");
                 }
             }
         }
