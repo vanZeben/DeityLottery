@@ -86,13 +86,13 @@ public class LotteryCommand implements CommandExecutor {
                 + "`username` )" + "VALUES (" + "'" + player.getName() + "');";
         double money = numTicket * Settings.getTicketPrice();
 
-        // if (LotteryObject.isWinner(player.getName())) {
-        // plugin.sendPlayerMessage(player,
-        // ChatTools.Red+"You have won a lottery in the past 10 days.");
-        // plugin.sendPlayerMessage(player,
-        // ChatTools.Red+"Don't be so greedy.");
-        // return;
-        // }
+        if (LotteryObject.isWinner(player.getName())) {
+            plugin.sendPlayerMessage(player, ChatTools.Red
+                    + "You have won a lottery in the past 10 days.");
+            plugin.sendPlayerMessage(player, ChatTools.Red
+                    + "Don't be so greedy.");
+            return;
+        }
 
         if ((LotteryObject.getNumTickets(player.getName()) + numTicket) > Settings
                 .getMaxTickets()) {
@@ -107,9 +107,14 @@ public class LotteryCommand implements CommandExecutor {
             for (int i = 0; i < numTicket; i++) {
                 Lottery.database.Write(sql);
             }
-            plugin.sendGlobalMessage(ChatTools.White + player.getName()
-                    + ChatTools.LightGray + " bought " + ChatTools.Yellow
-                    + numTicket + ChatTools.LightGray + " Tickets.");
+            if (numTicket == 1)
+                plugin.sendGlobalMessage(ChatTools.White + player.getName()
+                        + ChatTools.LightGray + " bought " + ChatTools.Yellow
+                        + numTicket + ChatTools.LightGray + " Ticket.");
+            else
+                plugin.sendGlobalMessage(ChatTools.White + player.getName()
+                        + ChatTools.LightGray + " bought " + ChatTools.Yellow
+                        + numTicket + ChatTools.LightGray + " Tickets.");
         } else {
             plugin.sendPlayerMessage(player, ChatTools.Red
                     + "You do not have enough money to do this.");
