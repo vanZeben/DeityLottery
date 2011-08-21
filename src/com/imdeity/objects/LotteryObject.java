@@ -42,7 +42,7 @@ public class LotteryObject {
                 + ChatTools.Yellow + winnings + ".00 Dei!";
 
         sql = "INSERT INTO  " + Settings.getMySQLWinnersTable() + " ("
-                + "`username`, `winnings`, `timestamp`)" + "VALUES (" + "'"
+                + "`username`, `winnings`, `time`)" + "VALUES (" + "'"
                 + winner + "', '" + winnings + "', NOW());";
 
         double money = winnings;

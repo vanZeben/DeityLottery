@@ -107,7 +107,9 @@ public class LotteryAdminCommand implements CommandExecutor {
         }
     }
 
-    public void forceDraw(Player player, String[] split) {
-        plugin.sendGlobalMessage(LotteryObject.drawWinner());
+    public void forceDraw(Player player, String[] split) { 
+        plugin.sendNonFormattedGlobalMessage(ChatTools
+                .formatTitle("Lottery"));
+        plugin.sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
     }
 }
