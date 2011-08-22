@@ -95,7 +95,7 @@ public class LotteryCommand implements CommandExecutor {
         }
 
         if (numTicket < 1) {
-            player.kickPlayer("Fuck off.");
+            player.kickPlayer("Do not try to exploit our system.");
             return;
         }
 
