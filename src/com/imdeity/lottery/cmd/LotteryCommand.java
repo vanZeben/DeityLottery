@@ -94,6 +94,12 @@ public class LotteryCommand implements CommandExecutor {
             return;
         }
 
+        if (numTicket < 1) {
+            plugin.sendPlayerMessage(player, ChatTools.Red
+                    + "Please don't try to exploit our system.");
+            return;
+        }
+
         if ((LotteryObject.getNumTickets(player.getName()) + numTicket) > Settings
                 .getMaxTickets()) {
             plugin.sendPlayerMessage(player,
@@ -132,8 +138,9 @@ public class LotteryCommand implements CommandExecutor {
 
     public boolean verifyBalance(Player player, double checkAmount) {
         if (iConomy.getAccount(player.getName()).getHoldings()
-                .hasEnough(checkAmount))
+                .hasEnough(checkAmount)) {
             return true;
+        }
         return false;
     }
 }
