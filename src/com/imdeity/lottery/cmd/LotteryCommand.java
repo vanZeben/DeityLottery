@@ -95,8 +95,7 @@ public class LotteryCommand implements CommandExecutor {
         }
 
         if (numTicket < 1) {
-            plugin.sendPlayerMessage(player, ChatTools.Red
-                    + "Please don't try to exploit our system.");
+            player.kickPlayer("Fuck off.");
             return;
         }
 
