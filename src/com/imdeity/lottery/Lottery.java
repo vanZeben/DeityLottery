@@ -114,38 +114,48 @@ public class Lottery extends JavaPlugin {
             String[] time = database.Read("SELECT NOW()").get(1).get(0)
                     .split(" ");
             double currentTime = Double.parseDouble((time[1].split(":"))[2]);
-            boolean isValid = currentTime == Settings.getTicketTime();
+
+            boolean timeIsValid = (currentTime == Settings.getTicketTime());
+            boolean timeIsGreater = (currentTime > Settings.getTicketTime());
 
             String[] lastTime = database
                     .Read("SELECT * FROM " + Settings.getMySQLWinnersTable()
                             + " ORDER BY `id` DESC LIMIT 1").get(1).get(3)
                     .split(" ");
-            int lastDraw = Integer.parseInt((lastTime[0].split("-"))[2]);
-            int currentDraw = Integer.parseInt((time[0].split("-"))[2]);
+            int lastDrawDate = Integer.parseInt((lastTime[0].split("-"))[2]);
+            int currentDrawDate = Integer.parseInt((time[0].split("-"))[2]);
+
+            boolean dateIsDrawn = (currentDrawDate == (lastDrawDate));
+            boolean dateIsValid = ((currentDrawDate - 1) >= lastDrawDate);
 
             if (Settings.isInDebug()) {
                 String output = "";
 
-                if (LotteryObject.getPot() != 0 && isValid
-                        && (lastDraw < currentDraw)) {
+                if (LotteryObject.getPot() == 0) {
+                    output += "No Money in pot";
+                    return;
+                }
+
+                if (timeIsValid && dateIsValid) {
+                    // defaults
                     sendNonFormattedGlobalMessage(ChatTools
                             .formatTitle("Lottery"));
                     sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
                     output += "Lottery Ran on time: " + time[1] + "\n";
-                    output += "lastDraw: " + lastDraw + "|" + "currentDraw "
-                            + currentDraw;
-                } else if (LotteryObject.getPot() != 0
-                        && lastDraw == currentDraw && isValid) {
-                    output += "Lottery already ran today: " + currentTime;
-                } else if (LotteryObject.getPot() != 0
-                        && ((lastDraw + 1) == currentDraw)
-                        && (currentTime > Settings.getTicketTime())) {
+                    output += "lastDraw: " + lastDrawDate + "|"
+                            + "currentDraw " + currentDrawDate;
+
+                } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
+                    // behind more then an hour
                     sendNonFormattedGlobalMessage(ChatTools
                             .formatTitle("Lottery"));
                     sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
-                    output += "Lottery was one day behind: " + time[1] + "\n";
-                    output += "lastDraw: " + lastDraw + "|" + "currentDraw "
-                            + currentDraw;
+                    output += "Lottery was behind today: " + time[1] + "\n";
+                    output += "lastDraw: " + lastDrawDate + "|"
+                            + "currentDraw " + currentDrawDate;
+                } else if (dateIsDrawn) {
+                    // already drew
+                    output += "Lottery already ran today: " + currentTime;
                 } else {
                     output = "Checking Lottery: " + time[1];
                 }
@@ -156,20 +166,18 @@ public class Lottery extends JavaPlugin {
                     e.printStackTrace();
                 }
             } else {
-                if (LotteryObject.getPot() != 0 && isValid
-                        && (lastDraw < currentDraw)) {
+                if (timeIsValid && dateIsValid) {
+                    // defaults
                     sendNonFormattedGlobalMessage(ChatTools
                             .formatTitle("Lottery"));
                     sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
-                } else if (LotteryObject.getPot() != 0
-                        && ((lastDraw + 1) == currentDraw)
-                        && (currentTime > Settings.getTicketTime())) {
+                } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
+                    // behind more then an hour
                     sendNonFormattedGlobalMessage(ChatTools
                             .formatTitle("Lottery"));
                     sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
-                } else if (LotteryObject.getPot() != 0
-                        && lastDraw == currentDraw && isValid) {
-                    out("Already ran today");
+                } else if (dateIsDrawn) {
+                    // already drew
                 }
             }
         }
