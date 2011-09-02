@@ -26,7 +26,7 @@ public class LotteryAdminCommand implements CommandExecutor {
         output.add(ChatTools.formatCommand("", "/lotteryadmin",
                 "removefrompot [n]", "Removes [n] to current pot."));
         output.add(ChatTools.formatCommand("", "/lotteryadmin", "draw",
-                "Forces a draw of t."));
+                "Forces a draw."));
     }
 
     public LotteryAdminCommand(Lottery instance) {
@@ -107,9 +107,7 @@ public class LotteryAdminCommand implements CommandExecutor {
         }
     }
 
-    public void forceDraw(Player player, String[] split) { 
-        plugin.sendNonFormattedGlobalMessage(ChatTools
-                .formatTitle("Lottery"));
-        plugin.sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+    public void forceDraw(Player player, String[] split) {
+        plugin.sendGlobalMessage(LotteryObject.drawWinner());
     }
 }

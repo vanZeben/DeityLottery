@@ -51,16 +51,14 @@ public class LotteryCommand implements CommandExecutor {
     public void parseCommand(Player player, String[] split) {
         if (split.length == 0) {
             List<String> out = new ArrayList<String>();
-            out.add(ChatTools.LightGray + "There is " + ChatTools.Yellow
-                    + LotteryObject.getPot() + ".00 " + ChatTools.LightGray
-                    + "Dei in the current pot.");
-            out.add(ChatTools.LightGray + "You have " + ChatTools.Yellow
+            out.add("<option><gray>There is <yellow>" + LotteryObject.getPot()
+                    + ".00 " + "<gray>Dei in the current pot.");
+            out.add("<option><gray>You have <yellow>"
                     + LotteryObject.getNumTickets(player.getName())
-                    + ChatTools.LightGray + " Tickets.");
-            out.add(ChatTools.LightGray
-                    + "Use /lottery ? for a list of commands.");
+                    + "<gray> Tickets.");
+            out.add("<option><yellow>Use /lottery ? for a list of commands.");
             for (String o : out)
-                plugin.sendPlayerMessage(player, o);
+                ChatTools.formatAndSend(o, "Lottery", player);
         } else if (split[0].equalsIgnoreCase("help")
                 || split[0].equalsIgnoreCase("?")) {
             for (String o : output)
@@ -87,22 +85,20 @@ public class LotteryCommand implements CommandExecutor {
         double money = numTicket * Settings.getTicketPrice();
 
         if (LotteryObject.isWinner(player.getName())) {
-            plugin.sendPlayerMessage(player, ChatTools.Red
-                    + "You have won a lottery in the past 10 days.");
-            plugin.sendPlayerMessage(player, ChatTools.Red
-                    + "Don't be so greedy.");
+            warn(player, "You have won a lottery in the past 10 days.");
+            warn(player, "Don't be so greedy.");
             return;
         }
 
         if (numTicket < 1) {
-            player.kickPlayer("Do not try to exploit our system.");
+            warn(player, "Negative Tickets? Yea...that makes sense.");
             return;
         }
 
         if ((LotteryObject.getNumTickets(player.getName()) + numTicket) > Settings
                 .getMaxTickets()) {
-            plugin.sendPlayerMessage(player,
-                    ChatTools.Red + "You can only have a maximum of "
+            warn(player,
+                    "You can only have a maximum of "
                             + Settings.getMaxTickets() + " Tickets.");
             return;
         }
@@ -113,16 +109,15 @@ public class LotteryCommand implements CommandExecutor {
                 Lottery.database.Write(sql);
             }
             if (numTicket == 1)
-                plugin.sendGlobalMessage(ChatTools.White + player.getName()
-                        + ChatTools.LightGray + " bought " + ChatTools.Yellow
-                        + numTicket + ChatTools.LightGray + " Ticket.");
+                plugin.sendGlobalMessage("<option><white>"+ player.getName()
+                        + "<gray> bought <yellow>"
+                        + numTicket + "<gray> Ticket.");
             else
-                plugin.sendGlobalMessage(ChatTools.White + player.getName()
-                        + ChatTools.LightGray + " bought " + ChatTools.Yellow
-                        + numTicket + ChatTools.LightGray + " Tickets.");
+                plugin.sendGlobalMessage("<option><white>" + player.getName()
+                        + "<gray> bought <yellow>"
+                        + numTicket + "<gray> Tickets.");
         } else {
-            plugin.sendPlayerMessage(player, ChatTools.Red
-                    + "You do not have enough money to do this.");
+            warn(player, "You do not have enough money to do this.");
         }
     }
 
@@ -130,7 +125,7 @@ public class LotteryCommand implements CommandExecutor {
         ArrayList<String> winners = LotteryObject.getWinners();
         player.sendMessage(ChatTools.formatTitle("Lottery Winners"));
         for (String s : winners) {
-            plugin.sendPlayerMessage(player, s);
+           player.sendMessage(s);
         }
 
     }
@@ -141,5 +136,9 @@ public class LotteryCommand implements CommandExecutor {
             return true;
         }
         return false;
+    }
+
+    public void warn(Player player, String msg) {
+        ChatTools.formatAndSend("<option><red>" + msg, "Lottery", player);
     }
 }

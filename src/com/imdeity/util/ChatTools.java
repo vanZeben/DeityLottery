@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 public class ChatTools {
     public static final String Black = "\u00A70";
@@ -101,9 +102,10 @@ public class ChatTools {
     public static String formatTitle(String title) {
         String line = ".oOo.__________________________________________________.oOo.";
         int pivot = line.length() / 2;
-        String center = ".[ " + Yellow + title + Gold + " ].";
-        String out = Gold + line.substring(0, pivot - center.length() / 2);
+        String center = ".[ " + "<yellow>" + title + "<gold>" + " ].";
+        String out = "<gold>" + line.substring(0, pivot - center.length() / 2);
         out += center + line.substring(pivot + center.length() / 2);
+        out = formatMessage(out, "");
         return out;
     }
 
@@ -111,23 +113,107 @@ public class ChatTools {
             String subCommand, String help) {
         String out = "  ";
         if (requirement.length() > 0)
-            out += Rose + requirement + ": ";
-        out += Blue + command;
+            out += "<red>" + requirement + ": ";
+        out += "<teal>" + command;
         if (subCommand.length() > 0)
-            out += " " + LightBlue + subCommand;
+            out += " " + "<aqua>" + subCommand;
         if (help.length() > 0)
-            out += " " + LightGray + " : " + help;
+            out += " " + "<gray>" + " : " + help;
+        out = formatMessage(out, "");
         return out;
     }
 
     public static String formatUserList(String user, String winnings) {
-        return (White + user + LightGray + " won " + Yellow + winnings + ".00 "
-                + LightGray + "Dei");
+        return (formatMessage("<white>" + user + "<gray> won <yellow>"
+                + winnings + ".00" + "<gray> Dei", ""));
     }
 
     public static String strip(String line) {
         for (ChatColor cc : ChatColor.values())
             line.replaceAll(cc.toString(), "");
         return line;
+    }
+
+    public static String formatMessage(String msg, String option) {
+        String message = msg;
+
+        if (message.contains("<header>")) {
+            message = message.replaceAll("<header>",
+                    ("<gray>[<red>*ImDeity*<gray>] "));
+        }
+        if (message.contains("<option>")) {
+            message = message.replaceAll("<option>",
+                    ("<gray>[<red>*" + option + "*<gray>] "));
+        }
+        if (message.contains("<subheader>")) {
+            message = message.replaceAll("<subheader>",
+                    ("<gray>[<red>*<gray>] "));
+        }
+        if (message.contains("<red>")) {
+            message = message.replaceAll("<red>", "" + ChatColor.RED);
+        }
+        if (message.contains("<black>")) {
+            message = message.replaceAll("<black>", "" + ChatColor.BLACK);
+        }
+        if (message.contains("<darkblue>")) {
+            message = message
+                    .replaceAll("<darkblue>", "" + ChatColor.DARK_BLUE);
+        }
+        if (message.contains("<darkgreen>")) {
+            message = message.replaceAll("<darkgreen>", ""
+                    + ChatColor.DARK_GREEN);
+        }
+        if (message.contains("<blue>")) {
+            message = message.replaceAll("<blue>", "" + ChatColor.BLUE);
+        }
+        if (message.contains("<aqua>")) {
+            message = message.replaceAll("<aqua>", "" + ChatColor.AQUA);
+        }
+        if (message.contains("<teal>")) {
+            message = message.replaceAll("<teal>", "" + ChatColor.DARK_AQUA);
+        }
+        if (message.contains("<blue>")) {
+            message = message.replaceAll("<blue>", "" + ChatColor.BLUE);
+        }
+        if (message.contains("<darkred>")) {
+            message = message.replaceAll("<darkred>", "" + ChatColor.DARK_RED);
+        }
+        if (message.contains("<purple>")) {
+            message = message.replaceAll("<purple>", ""
+                    + ChatColor.LIGHT_PURPLE);
+        }
+        if (message.contains("<gold>")) {
+            message = message.replaceAll("<gold>", "" + ChatColor.GOLD);
+        }
+        if (message.contains("<gray>")) {
+            message = message.replaceAll("<gray>", "" + ChatColor.GRAY);
+        }
+        if (message.contains("<darkgray>")) {
+            message = message
+                    .replaceAll("<darkgray>", "" + ChatColor.DARK_GRAY);
+        }
+        if (message.contains("<darkpurple>")) {
+            message = message.replaceAll("<darkpurple>", ""
+                    + ChatColor.DARK_PURPLE);
+        }
+        if (message.contains("<green>")) {
+            message = message.replaceAll("<green>", "" + ChatColor.GREEN);
+        }
+        if (message.contains("<red>")) {
+            message = message.replaceAll("<red>", "" + ChatColor.RED);
+        }
+        if (message.contains("<yellow>")) {
+            message = message.replaceAll("<yellow>", "" + ChatColor.YELLOW);
+        }
+        if (message.contains("<white>")) {
+            message = message.replaceAll("<white>", "" + ChatColor.WHITE);
+        }
+        return message;
+    }
+
+    public static void formatAndSend(String msg, String option, Player player) {
+        String message = formatMessage(msg, option);
+
+        player.sendMessage(message);
     }
 }

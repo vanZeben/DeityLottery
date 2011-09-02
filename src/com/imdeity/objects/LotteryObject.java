@@ -38,8 +38,8 @@ public class LotteryObject {
             return output;
         }
 
-        output = ChatTools.White + winner + ChatTools.LightGray + " won "
-                + ChatTools.Yellow + winnings + ".00 Dei!";
+        output = "<option><white>" + winner +  "<gray> won <yellow>"
+               + winnings + ".00 Dei!";
 
         sql = "INSERT INTO  " + Settings.getMySQLWinnersTable() + " ("
                 + "`username`, `winnings`, `time`)" + "VALUES (" + "'"

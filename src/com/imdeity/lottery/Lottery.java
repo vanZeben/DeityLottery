@@ -97,24 +97,14 @@ public class Lottery extends JavaPlugin {
 
     public void sendGlobalMessage(String message) {
         for (Player p : this.getServer().getOnlinePlayers())
-            p.sendMessage(ChatTools.Gray + "[Lottery] " + message);
-    }
-
-    public void sendNonFormattedGlobalMessage(String message) {
-        for (Player p : this.getServer().getOnlinePlayers())
-            p.sendMessage(message);
-    }
-
-    public void sendPlayerMessage(Player p, String message) {
-        p.sendMessage(ChatTools.Gray + "[Lottery] " + message);
+           ChatTools.formatAndSend(message, "Lottery", p);
     }
 
     public class Announce implements Runnable {
         public void run() {
             String[] time = database.Read("SELECT NOW()").get(1).get(0)
                     .split(" ");
-            double currentTime = Double.parseDouble((time[1].split(":"))[2]);
-
+            double currentTime = Double.parseDouble((time[1].split(":"))[0]);
             boolean timeIsValid = (currentTime == Settings.getTicketTime());
             boolean timeIsGreater = (currentTime > Settings.getTicketTime());
 
@@ -135,21 +125,16 @@ public class Lottery extends JavaPlugin {
                     output += "No Money in pot";
                     return;
                 }
-
                 if (timeIsValid && dateIsValid) {
                     // defaults
-                    sendNonFormattedGlobalMessage(ChatTools
-                            .formatTitle("Lottery"));
-                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    sendGlobalMessage(LotteryObject.drawWinner());
                     output += "Lottery Ran on time: " + time[1] + "\n";
                     output += "lastDraw: " + lastDrawDate + "|"
                             + "currentDraw " + currentDrawDate;
 
                 } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
                     // behind more then an hour
-                    sendNonFormattedGlobalMessage(ChatTools
-                            .formatTitle("Lottery"));
-                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    sendGlobalMessage(LotteryObject.drawWinner());
                     output += "Lottery was behind today: " + time[1] + "\n";
                     output += "lastDraw: " + lastDrawDate + "|"
                             + "currentDraw " + currentDrawDate;
@@ -168,14 +153,10 @@ public class Lottery extends JavaPlugin {
             } else {
                 if (timeIsValid && dateIsValid) {
                     // defaults
-                    sendNonFormattedGlobalMessage(ChatTools
-                            .formatTitle("Lottery"));
-                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    sendGlobalMessage(LotteryObject.drawWinner());
                 } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
                     // behind more then an hour
-                    sendNonFormattedGlobalMessage(ChatTools
-                            .formatTitle("Lottery"));
-                    sendNonFormattedGlobalMessage(LotteryObject.drawWinner());
+                    sendGlobalMessage(LotteryObject.drawWinner());
                 } else if (dateIsDrawn) {
                     // already drew
                 }
