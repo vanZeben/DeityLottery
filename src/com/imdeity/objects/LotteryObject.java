@@ -30,10 +30,14 @@ public class LotteryObject {
 
         try {
             winnings = getPot();
-            sql = "SELECT * FROM " + Settings.getMySQLPlayersTable()
+            sql = "SELECT `username` FROM " + Settings.getMySQLPlayersTable()
                     + " ORDER BY RAND() LIMIT 1";
             winner = Lottery.database.Read(sql).get(1).get(1);
-        } catch (Exception ex) {
+            
+            if (winner.isEmpty() || winner == null) {
+                winner = Lottery.database.Read(sql).get(1).get(1); 
+            }
+        } catch (Exception ex) { 
             ex.printStackTrace();
         }
 
