@@ -34,8 +34,7 @@ public class LotteryObject {
                     + " ORDER BY RAND() LIMIT 1";
             winner = Lottery.database.Read(sql).get(1).get(1);
         } catch (Exception ex) {
-            output = ChatTools.Red + "";
-            return output;
+            ex.printStackTrace();
         }
 
         output = "<option><white>" + winner +  "<gray> won <yellow>"
@@ -44,13 +43,17 @@ public class LotteryObject {
         sql = "INSERT INTO  " + Settings.getMySQLWinnersTable() + " ("
                 + "`username`, `winnings`, `time`)" + "VALUES (" + "'"
                 + winner + "', '" + winnings + "', NOW());";
+        if (!winner.isEmpty() && winner != null) {
+            double money = winnings;
+            iConomy.getAccount(winner).getHoldings().add(money);
+            Lottery.database.Write(sql);
 
-        double money = winnings;
-        iConomy.getAccount(winner).getHoldings().add(money);
-        Lottery.database.Write(sql);
-
-        clear();
-        return output;
+            clear();
+            return output;
+        } else {
+            System.out.println("[Lottery] Winner field was null");
+            return "";
+        }
     }
 
     public static ArrayList<String> getWinners() {
