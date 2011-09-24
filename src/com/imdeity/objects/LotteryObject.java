@@ -32,10 +32,12 @@ public class LotteryObject {
             winnings = getPot();
             sql = "SELECT `username` FROM " + Settings.getMySQLPlayersTable()
                     + " ORDER BY RAND() LIMIT 1";
-            winner = Lottery.database.Read(sql).get(1).get(0);
-            
-            if (winner.isEmpty() || winner == null) {
+            if (!Lottery.database.Read(sql).isEmpty()  || !Lottery.database.Read(sql).get(1).isEmpty() || Lottery.database.Read(sql).get(1).get(0) != null) {
                 winner = Lottery.database.Read(sql).get(1).get(0); 
+            } else {
+                System.out.println("[Lottery] Lottery Players table is empty.");
+                if (Settings.isInDebug())
+                    System.out.println("[Lottery Debug] " + Lottery.database.Read(sql));
             }
         } catch (Exception ex) { 
             ex.printStackTrace();
@@ -55,7 +57,7 @@ public class LotteryObject {
             clear();
             return output;
         } else {
-            System.out.println("[Lottery] Winner field was null");
+            System.out.println("[Lottery] Player field was null");
             return "";
         }
     }
