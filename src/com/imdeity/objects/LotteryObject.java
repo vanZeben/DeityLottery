@@ -23,6 +23,9 @@ public class LotteryObject {
         }
     }
 
+    /**
+     * @return
+     */
     public static String drawWinner() {
         String output = "";
         String sql = "";
@@ -51,6 +54,8 @@ public class LotteryObject {
                 + "`username`, `winnings`, `time`)" + "VALUES (" + "'"
                 + winner + "', '" + winnings + "', NOW());";
         if (!winner.isEmpty() && winner != null) {
+            Lottery.database.Write(sql);
+            
             double money = winnings;
             Account account = iConomy.getAccount(winner);
             if (account == null) {
@@ -58,8 +63,6 @@ public class LotteryObject {
                 return "";
             }
             account.getHoldings().add(money);
-            Lottery.database.Write(sql);
-
             clear();
             return output;
         } else {
