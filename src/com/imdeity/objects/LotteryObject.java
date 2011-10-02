@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.iConomy.iConomy;
+import com.iConomy.system.Account;
 import com.imdeity.lottery.Lottery;
 import com.imdeity.util.ChatTools;
 import com.imdeity.util.Settings;
@@ -51,7 +52,12 @@ public class LotteryObject {
                 + winner + "', '" + winnings + "', NOW());";
         if (!winner.isEmpty() && winner != null) {
             double money = winnings;
-            iConomy.getAccount(winner).getHoldings().add(money);
+            Account account = iConomy.getAccount(winner);
+            if (account == null) {
+                System.out.println(String.format("[Lottery] %s had a null iConomy Account", winner));
+                return "";
+            }
+            account.getHoldings().add(money);
             Lottery.database.Write(sql);
 
             clear();
