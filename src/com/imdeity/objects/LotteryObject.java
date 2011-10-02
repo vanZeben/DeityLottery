@@ -33,7 +33,7 @@ public class LotteryObject {
             winnings = getPot();
             sql = "SELECT `username` FROM " + Settings.getMySQLPlayersTable()
                     + " ORDER BY RAND() LIMIT 1";
-            if (!Lottery.database.Read(sql).isEmpty()  || !Lottery.database.Read(sql).get(1).isEmpty() || Lottery.database.Read(sql).get(1).get(0) != null) {
+            if (!Lottery.database.Read(sql).isEmpty()  && !Lottery.database.Read(sql).get(1).isEmpty() && Lottery.database.Read(sql).get(1).get(0) != null) {
                 winner = Lottery.database.Read(sql).get(1).get(0); 
             } else {
                 System.out.println("[Lottery] Lottery Players table is empty.");
