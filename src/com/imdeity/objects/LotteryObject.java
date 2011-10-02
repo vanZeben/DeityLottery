@@ -42,6 +42,7 @@ public class LotteryObject {
                 System.out.println("[Lottery] Lottery Players table is empty.");
                 if (Settings.isInDebug())
                     System.out.println("[Lottery Debug] " + Lottery.database.Read(sql));
+                return "";
             }
         } catch (Exception ex) { 
             ex.printStackTrace();
