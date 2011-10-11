@@ -8,15 +8,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.iConomy.iConomy;
 import com.imdeity.lottery.Lottery;
-import com.imdeity.objects.LotteryObject;
-import com.imdeity.util.*;
+import com.imdeity.lottery.objects.LotteryObject;
+import com.imdeity.lottery.util.*;
+import com.imdeity.profile.Deity;
+import com.imdeity.profile.exception.InvalidChannelException;
+import com.imdeity.profile.exception.InvalidFundsException;
+import com.imdeity.profile.exception.NegativeMoneyException;
 
 public class LotteryCommand implements CommandExecutor {
 
     private static final List<String> output = new ArrayList<String>();
-    private Lottery plugin = null;
 
     static {
         output.add(ChatTools.formatTitle("Lottery"));
@@ -26,11 +28,6 @@ public class LotteryCommand implements CommandExecutor {
                 "Buys one or [n] of lottery tickets."));
         output.add(ChatTools.formatCommand("", "/lottery", "winners",
                 "Gets past lottery winners."));
-    }
-
-    public LotteryCommand(Lottery instance) {
-        this.plugin = instance;
-
     }
 
     @Override
@@ -62,10 +59,18 @@ public class LotteryCommand implements CommandExecutor {
         } else if (split[0].equalsIgnoreCase("help")
                 || split[0].equalsIgnoreCase("?")) {
             for (String o : output)
-                player.sendMessage(o);
+                Deity.chat.sendPlayerMessage(player, o);
         } else if (split[0].equalsIgnoreCase("buy")
                 || split[0].equalsIgnoreCase("b")) {
-            buyCommand(player, split);
+            try {
+                buyCommand(player, split);
+            } catch(InvalidFundsException ex) {
+                Deity.chat.sendPlayerError(player, ex.getError());
+            } catch (NegativeMoneyException ex) {
+                Deity.chat.sendPlayerError(player, ex.getError());
+            } catch (InvalidChannelException ex) {
+                ex.printStackTrace();
+            }
         } else if (split[0].equalsIgnoreCase("winners")
                 || split[0].equalsIgnoreCase("w")) {
             winnersCommand(player, split);
@@ -74,7 +79,7 @@ public class LotteryCommand implements CommandExecutor {
         }
     }
 
-    public void buyCommand(Player player, String[] split) {
+    public void buyCommand(Player player, String[] split) throws InvalidFundsException, NegativeMoneyException, InvalidChannelException {
         int numTicket = 1;
         String sql = "";
         if (split.length == 2)
@@ -85,39 +90,36 @@ public class LotteryCommand implements CommandExecutor {
         double money = numTicket * Settings.getTicketPrice();
 
         if (LotteryObject.isWinner(player.getName())) {
-            warn(player, "You have won a lottery in the past 10 days.");
-            warn(player, "Don't be so greedy.");
+            Deity.chat.sendPlayerError(player, "You have won a lottery in the past 10 days.");
+            Deity.chat.sendPlayerError(player, "Don't be so greedy.");
             return;
         }
 
         if (numTicket < 1) {
-            warn(player, "Negative Tickets? Yea...that makes sense.");
+            Deity.chat.sendPlayerError(player, "Negative Tickets? Yea...that makes sense.");
             return;
         }
 
         if ((LotteryObject.getNumTickets(player.getName()) + numTicket) > Settings
                 .getMaxTickets()) {
-            warn(player,
+            Deity.chat.sendPlayerError(player,
                     "You can only have a maximum of "
                             + Settings.getMaxTickets() + " Tickets.");
             return;
         }
 
-        if (verifyBalance(player, money)) {
-            iConomy.getAccount(player.getName()).getHoldings().subtract(money);
+        if (Deity.econ.canPay(player.getName(), money)) {
             for (int i = 0; i < numTicket; i++) {
-                Lottery.database.Write(sql);
+                Deity.server.getDB().Write(sql);
             }
             if (numTicket == 1)
-                plugin.sendGlobalMessage("<option><white>"+ player.getName()
-                        + "<gray> bought <yellow>"
-                        + numTicket + "<gray> Ticket.");
+                Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", player.getName() +" just bought " + numTicket + " Ticket!");
             else
-                plugin.sendGlobalMessage("<option><white>" + player.getName()
-                        + "<gray> bought <yellow>"
-                        + numTicket + "<gray> Tickets.");
+                Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", player.getName() +" just bought " + numTicket + " Tickets!");
+            
+            Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", "\'/lottery buy #\' to get in on the action yourself");
         } else {
-            warn(player, "You do not have enough money to do this.");
+            throw new InvalidFundsException();
         }
     }
 
@@ -125,20 +127,8 @@ public class LotteryCommand implements CommandExecutor {
         ArrayList<String> winners = LotteryObject.getWinners();
         player.sendMessage(ChatTools.formatTitle("Lottery Winners"));
         for (String s : winners) {
-           player.sendMessage(s);
+           Deity.chat.sendPlayerMessage(player, s);
         }
 
-    }
-
-    public boolean verifyBalance(Player player, double checkAmount) {
-        if (iConomy.getAccount(player.getName()).getHoldings()
-                .hasEnough(checkAmount)) {
-            return true;
-        }
-        return false;
-    }
-
-    public void warn(Player player, String msg) {
-        ChatTools.formatAndSend("<option><red>" + msg, "Lottery", player);
     }
 }

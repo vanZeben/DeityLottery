@@ -1,13 +1,13 @@
-package com.imdeity.objects;
+package com.imdeity.lottery.objects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.iConomy.iConomy;
-import com.iConomy.system.Account;
-import com.imdeity.lottery.Lottery;
-import com.imdeity.util.ChatTools;
-import com.imdeity.util.Settings;
+import com.imdeity.lottery.util.ChatTools;
+import com.imdeity.lottery.util.Settings;
+import com.imdeity.profile.Deity;
+import com.imdeity.profile.exception.InvalidChannelException;
+import com.imdeity.profile.exception.NegativeMoneyException;
 
 public class LotteryObject {
 
@@ -16,7 +16,7 @@ public class LotteryObject {
                 + " ORDER BY `id` DESC LIMIT 1";
 
         try {
-            return ((Integer.parseInt(Lottery.database.Read(sql).get(1).get(0))) * (Settings
+            return ((Integer.parseInt(Deity.server.getDB().Read(sql).get(1).get(0))) * (Settings
                     .getTicketPrice())) + (Settings.getExtraPot());
         } catch (Exception ex) {
             return 0;
@@ -26,8 +26,7 @@ public class LotteryObject {
     /**
      * @return
      */
-    public static String drawWinner() {
-        String output = "";
+    public static void drawWinner() {
         String sql = "";
         int winnings = 0;
         String winner = "";
@@ -36,39 +35,39 @@ public class LotteryObject {
             winnings = getPot();
             sql = "SELECT `username` FROM " + Settings.getMySQLPlayersTable()
                     + " ORDER BY RAND() LIMIT 1";
-            if (!Lottery.database.Read(sql).isEmpty()  && !Lottery.database.Read(sql).get(1).isEmpty() && Lottery.database.Read(sql).get(1).get(0) != null) {
-                winner = Lottery.database.Read(sql).get(1).get(0); 
+            if (!Deity.server.getDB().Read(sql).isEmpty()  && !Deity.server.getDB().Read(sql).get(1).isEmpty() && Deity.server.getDB().Read(sql).get(1).get(0) != null) {
+                winner = Deity.server.getDB().Read(sql).get(1).get(0); 
             } else {
                 System.out.println("[Lottery] Lottery Players table is empty.");
                 if (Settings.isInDebug())
-                    System.out.println("[Lottery Debug] " + Lottery.database.Read(sql));
-                return "";
+                    System.out.println("[Lottery Debug] " + Deity.server.getDB().Read(sql));
+                return;
             }
         } catch (Exception ex) { 
             ex.printStackTrace();
         }
 
-        output = "<option><white>" + winner +  "<gray> won <yellow>"
-               + winnings + ".00 Dei!";
-
         sql = "INSERT INTO  " + Settings.getMySQLWinnersTable() + " ("
                 + "`username`, `winnings`, `time`)" + "VALUES (" + "'"
                 + winner + "', '" + winnings + "', NOW());";
         if (!winner.isEmpty() && winner != null) {
-            Lottery.database.Write(sql);
+            Deity.server.getDB().Write(sql);
             
             double money = winnings;
-            Account account = iConomy.getAccount(winner);
-            if (account == null) {
-                System.out.println(String.format("[Lottery] %s had a null iConomy Account", winner));
-                return "";
+            try {
+                Deity.econ.receive(winner, money);
+            } catch (NegativeMoneyException e) {
+                e.printStackTrace();
             }
-            account.getHoldings().add(money);
+            Deity.chat.sendMailToPlayer("ImDeityBot", winner, "Guess what? You just won the daily lottery worth "+winnings+" Dei!");
             clear();
-            return output;
+            try {
+                Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", "Guess what everybody... "+winner+" just won "+money+" dei in the lottery.");
+            } catch (InvalidChannelException e) {
+                e.printStackTrace();
+            }
         } else {
             System.out.println("[Lottery] Player field was null");
-            return "";
         }
     }
 
@@ -79,8 +78,7 @@ public class LotteryObject {
         sql = "SELECT * FROM " + Settings.getMySQLWinnersTable()
                 + " ORDER BY `id` DESC LIMIT 10";
 
-        HashMap<Integer, ArrayList<String>> winners = Lottery.database
-                .Read(sql);
+        HashMap<Integer, ArrayList<String>> winners = Deity.server.getDB().Read(sql);
         for (int i = 1; i <= winners.size(); i++) {
             out.add(ChatTools.formatUserList(winners.get(i).get(1), winners
                     .get(i).get(2)));
@@ -94,8 +92,7 @@ public class LotteryObject {
         sql = "SELECT * FROM " + Settings.getMySQLWinnersTable()
                 + " ORDER BY `id` DESC LIMIT 10";
 
-        HashMap<Integer, ArrayList<String>> winners = Lottery.database
-                .Read(sql);
+        HashMap<Integer, ArrayList<String>> winners = Deity.server.getDB().Read(sql);
         for (int i = 1; i <= winners.size(); i++) {
             if (winners.get(i).get(1).equalsIgnoreCase(name)) {
                 return true;
@@ -108,7 +105,7 @@ public class LotteryObject {
         String sql = "SELECT * FROM " + Settings.getMySQLPlayersTable()
                 + " WHERE `username` = '" + name + "';";
         try {
-            return Lottery.database.Read(sql).size();
+            return Deity.server.getDB().Read(sql).size();
         } catch (Exception ex) {
             return 0;
         }
@@ -118,6 +115,6 @@ public class LotteryObject {
         String sql = "";
 
         sql = "TRUNCATE " + Settings.getMySQLPlayersTable() + ";";
-        Lottery.database.Write(sql);
+        Deity.server.getDB().Write(sql);
     }
 }

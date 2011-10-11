@@ -1,4 +1,4 @@
-package com.imdeity.util;
+package com.imdeity.lottery.util;
 
 import java.util.List;
 

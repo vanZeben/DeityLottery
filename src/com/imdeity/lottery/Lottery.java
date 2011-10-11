@@ -5,17 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.imdeity.lottery.cmd.LotteryAdminCommand;
 import com.imdeity.lottery.cmd.LotteryCommand;
-import com.imdeity.objects.LotteryObject;
-import com.imdeity.util.*;
+import com.imdeity.lottery.objects.LotteryObject;
+import com.imdeity.lottery.util.*;
+import com.imdeity.profile.Deity;
 
-import com.iConomy.iConomy;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -24,8 +23,6 @@ public class Lottery extends JavaPlugin {
     protected final Logger log = Logger.getLogger("Minecraft");
 
     public static PermissionHandler permissions = null;
-    public static iConomy iconomy = null;
-    public static MySQL database = null;
     public static Settings settings = null;
     public static Settings debug = null;
     private static int taskId = -1;
@@ -36,8 +33,8 @@ public class Lottery extends JavaPlugin {
         loadSettings();
         checkPlugins();
         verifyDatabase();
-        getCommand("lottery").setExecutor(new LotteryCommand(this));
-        getCommand("lotteryadmin").setExecutor(new LotteryAdminCommand(this));
+        getCommand("lottery").setExecutor(new LotteryCommand());
+        getCommand("lotteryadmin").setExecutor(new LotteryAdminCommand());
         taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this,
                 new Announce(), 0, (20 * 60 * 60));
         out(this.getDescription().getVersion() + " Enabled.");
@@ -74,7 +71,6 @@ public class Lottery extends JavaPlugin {
         if (test == null)
             setSetting("USING_ICONOMY", false);
         else {
-            iconomy = (iConomy) test;
             if (Settings.isUsingIConomy())
                 using.add("iConomy");
         }
@@ -83,7 +79,19 @@ public class Lottery extends JavaPlugin {
     }
 
     private void verifyDatabase() {
-        database = new MySQL();
+        Deity.server.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLPlayersTable() + " ("
+                + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+                + "`username` varchar(16) NOT NULL,"
+                + "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 "
+                + "COMMENT='Current lottery players log';");
+
+        Deity.server.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLWinnersTable() + " ("
+                + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+                + "`username` VARCHAR( 16 ) NOT NULL ,"
+                + "`winnings` INT( 10 ) NOT NULL DEFAULT  '0' ,"
+                + "`time` TIMESTAMP NOT NULL,"
+                + "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 "
+                + "COMMENT='Past Lottery winners.';");
     }
 
     public void setSetting(String root, Object value) {
@@ -95,23 +103,16 @@ public class Lottery extends JavaPlugin {
         log.info("[" + pdfFile.getName() + "] " + message);
     }
 
-    public void sendGlobalMessage(String message) {
-        for (Player p : this.getServer().getOnlinePlayers())
-           ChatTools.formatAndSend(message, "Lottery", p);
-    }
-
     public class Announce implements Runnable {
         public void run() {
-            String[] time = database.Read("SELECT NOW()").get(1).get(0)
+            String[] time = Deity.server.getDB().Read("SELECT NOW()").get(1).get(0)
                     .split(" ");
             double currentTime = Double.parseDouble((time[1].split(":"))[0]);
             boolean timeIsValid = (currentTime == Settings.getTicketTime());
             boolean timeIsGreater = (currentTime > Settings.getTicketTime());
 
-            String[] lastTime = database
-                    .Read("SELECT * FROM " + Settings.getMySQLWinnersTable()
-                            + " ORDER BY `id` DESC LIMIT 1").get(1).get(3)
-                    .split(" ");
+            String[] lastTime = Deity.server.getDB().Read("SELECT * FROM " + Settings.getMySQLWinnersTable()
+                            + " ORDER BY `id` DESC LIMIT 1").get(1).get(3).split(" ");
             int lastDrawDate = Integer.parseInt((lastTime[0].split("-"))[2]);
             int currentDrawDate = Integer.parseInt((time[0].split("-"))[2]);
 
@@ -127,14 +128,14 @@ public class Lottery extends JavaPlugin {
                 }
                 if (timeIsValid && dateIsValid) {
                     // defaults
-                    sendGlobalMessage(LotteryObject.drawWinner());
+                    LotteryObject.drawWinner();
                     output += "Lottery Ran on time: " + time[1] + "\n";
                     output += "lastDraw: " + lastDrawDate + "|"
                             + "currentDraw " + currentDrawDate;
 
                 } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
                     // behind more then an hour
-                    sendGlobalMessage(LotteryObject.drawWinner());
+                    LotteryObject.drawWinner();
                     output += "Lottery was behind today: " + time[1] + "\n";
                     output += "lastDraw: " + lastDrawDate + "|"
                             + "currentDraw " + currentDrawDate;
@@ -151,12 +152,15 @@ public class Lottery extends JavaPlugin {
                     e.printStackTrace();
                 }
             } else {
+                if (LotteryObject.getPot() == 0) {
+                    return;
+                }
                 if (timeIsValid && dateIsValid) {
                     // defaults
-                    sendGlobalMessage(LotteryObject.drawWinner());
+                    LotteryObject.drawWinner();
                 } else if (dateIsValid && timeIsGreater && (!dateIsDrawn))  {
                     // behind more then an hour
-                    sendGlobalMessage(LotteryObject.drawWinner());
+                    LotteryObject.drawWinner();
                 } else if (dateIsDrawn) {
                     // already drew
                 }

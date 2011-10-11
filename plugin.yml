@@ -3,7 +3,7 @@ main: com.imdeity.lottery.Lottery
 version: 0.0.1
 author: vanZeben
 website: www.imdeity.com
-
+softdepend: [ImDeityProfile]
 commands:
   lottery:
         aliases: []

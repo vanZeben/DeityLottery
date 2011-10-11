@@ -1,4 +1,4 @@
-package com.imdeity.util;
+package com.imdeity.lottery.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.util.config.Configuration;
 
 import com.imdeity.lottery.Lottery;
+import com.imdeity.profile.Deity;
 
 @SuppressWarnings("unused")
 public class Settings {
@@ -157,11 +158,11 @@ public class Settings {
     }
 
     public static String getMySQLPlayersTable() {
-        return MySQL.tableName("players");
+        return Deity.server.getDB().tableName("players", getMySQLDatabaseTablePrefix());
     }
 
     public static String getMySQLWinnersTable() {
-        return MySQL.tableName("winners");
+        return Deity.server.getDB().tableName("winners", getMySQLDatabaseTablePrefix());
     }
 
     // /////////////////////

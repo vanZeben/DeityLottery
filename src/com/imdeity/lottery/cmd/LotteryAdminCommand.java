@@ -9,13 +9,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.imdeity.lottery.Lottery;
-import com.imdeity.objects.LotteryObject;
-import com.imdeity.util.*;
+import com.imdeity.lottery.objects.LotteryObject;
+import com.imdeity.lottery.util.*;
+import com.imdeity.profile.Deity;
 
 public class LotteryAdminCommand implements CommandExecutor {
 
     private static final List<String> output = new ArrayList<String>();
-    private Lottery plugin = null;
 
     static {
         output.add(ChatTools.formatTitle("LotteryAdmin"));
@@ -27,11 +27,6 @@ public class LotteryAdminCommand implements CommandExecutor {
                 "removefrompot [n]", "Removes [n] to current pot."));
         output.add(ChatTools.formatCommand("", "/lotteryadmin", "draw",
                 "Forces a draw."));
-    }
-
-    public LotteryAdminCommand(Lottery instance) {
-        this.plugin = instance;
-
     }
 
     @Override
@@ -53,7 +48,7 @@ public class LotteryAdminCommand implements CommandExecutor {
 
         if (split.length == 0) {
             for (String o : output)
-                player.sendMessage(o);
+                Deity.chat.sendPlayerMessage(player, o);
             // } else if (split[0].equalsIgnoreCase("config") ||
             // split[0].equalsIgnoreCase("c")) {
             // config(player, split);
@@ -73,7 +68,7 @@ public class LotteryAdminCommand implements CommandExecutor {
 
     public void config(Player player, String[] split) {
         if (split.length == 1) {
-            player.sendMessage("HELP");
+            Deity.chat.sendPlayerError(player, "Invalid Syntax, please try again.");
         } else if (split[1].equalsIgnoreCase("")) {
 
         }
@@ -81,7 +76,7 @@ public class LotteryAdminCommand implements CommandExecutor {
 
     public void addToPot(Player player, String[] split) {
         if (split.length == 1) {
-            player.sendMessage("HELP");
+            Deity.chat.sendPlayerError(player, "Invalid Syntax, please try again.");
         } else {
             int num = 0;
             try {
@@ -95,7 +90,7 @@ public class LotteryAdminCommand implements CommandExecutor {
 
     public void removeFromPot(Player player, String[] split) {
         if (split.length == 1) {
-            player.sendMessage("HELP");
+            Deity.chat.sendPlayerError(player, "Invalid Syntax, please try again.");
         } else {
             int num = 0;
             try {
@@ -108,6 +103,6 @@ public class LotteryAdminCommand implements CommandExecutor {
     }
 
     public void forceDraw(Player player, String[] split) {
-        plugin.sendGlobalMessage(LotteryObject.drawWinner());
+        LotteryObject.drawWinner();
     }
 }
