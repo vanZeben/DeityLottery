@@ -9,27 +9,21 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.imdeity.deityapi.Deity;
 import com.imdeity.lottery.cmd.LotteryAdminCommand;
 import com.imdeity.lottery.cmd.LotteryCommand;
 import com.imdeity.lottery.objects.LotteryObject;
 import com.imdeity.lottery.util.*;
-import com.imdeity.profile.Deity;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class Lottery extends JavaPlugin {
 
     protected final Logger log = Logger.getLogger("Minecraft");
-
-    public static PermissionHandler permissions = null;
     public static Settings settings = null;
     public static Settings debug = null;
     private static int taskId = -1;
 
     @Override
     public void onEnable() {
-
         loadSettings();
         checkPlugins();
         verifyDatabase();
@@ -62,7 +56,6 @@ public class Lottery extends JavaPlugin {
         if (test == null)
             setSetting("USING_PERMISSIONS", false);
         else {
-            permissions = ((Permissions) test).getHandler();
             if (Settings.isUsingPermissions())
                 using.add("Permissions");
         }
@@ -79,17 +72,18 @@ public class Lottery extends JavaPlugin {
     }
 
     private void verifyDatabase() {
-        Deity.server.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLPlayersTable() + " ("
+        Deity.data.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLPlayersTable() + " ("
                 + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
                 + "`username` varchar(16) NOT NULL,"
                 + "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 "
                 + "COMMENT='Current lottery players log';");
 
-        Deity.server.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLWinnersTable() + " ("
+        Deity.data.getDB().Write("CREATE TABLE IF NOT EXISTS " + Settings.getMySQLWinnersTable() + " ("
                 + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
                 + "`username` VARCHAR( 16 ) NOT NULL ,"
                 + "`winnings` INT( 10 ) NOT NULL DEFAULT  '0' ,"
                 + "`time` TIMESTAMP NOT NULL,"
+                + "`has_claimed` INT( 1 ) NOT NULL DEFAULT '0' ,"
                 + "PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 "
                 + "COMMENT='Past Lottery winners.';");
     }
@@ -105,13 +99,13 @@ public class Lottery extends JavaPlugin {
 
     public class Announce implements Runnable {
         public void run() {
-            String[] time = Deity.server.getDB().Read("SELECT NOW()").get(1).get(0)
+            String[] time = Deity.data.getDB().Read("SELECT NOW()").get(1).get(0)
                     .split(" ");
             double currentTime = Double.parseDouble((time[1].split(":"))[0]);
             boolean timeIsValid = (currentTime == Settings.getTicketTime());
             boolean timeIsGreater = (currentTime > Settings.getTicketTime());
 
-            String[] lastTime = Deity.server.getDB().Read("SELECT * FROM " + Settings.getMySQLWinnersTable()
+            String[] lastTime = Deity.data.getDB().Read("SELECT * FROM " + Settings.getMySQLWinnersTable()
                             + " ORDER BY `id` DESC LIMIT 1").get(1).get(3).split(" ");
             int lastDrawDate = Integer.parseInt((lastTime[0].split("-"))[2]);
             int currentDrawDate = Integer.parseInt((time[0].split("-"))[2]);

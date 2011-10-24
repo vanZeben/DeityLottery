@@ -6,6 +6,7 @@ lottery:
     pot: 0
     time: 16
     max_tickets: 50
+    channel_name: global
     
 mysql:
     server:

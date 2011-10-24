@@ -8,10 +8,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.imdeity.lottery.Lottery;
+import com.imdeity.deityapi.Deity;
 import com.imdeity.lottery.objects.LotteryObject;
 import com.imdeity.lottery.util.*;
-import com.imdeity.profile.Deity;
 
 public class LotteryAdminCommand implements CommandExecutor {
 
@@ -34,7 +33,7 @@ public class LotteryAdminCommand implements CommandExecutor {
             String commandLabel, String args[]) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (Lottery.permissions.has(player, "lottery.admin")) {
+            if (Deity.perm.has(player, "lottery.admin")) {
                 parseCommand(player, args);
                 return true;
             }

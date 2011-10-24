@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.bukkit.util.config.Configuration;
 
+import com.imdeity.deityapi.Deity;
 import com.imdeity.lottery.Lottery;
-import com.imdeity.profile.Deity;
 
 @SuppressWarnings("unused")
 public class Settings {
@@ -158,11 +158,11 @@ public class Settings {
     }
 
     public static String getMySQLPlayersTable() {
-        return Deity.server.getDB().tableName("players", getMySQLDatabaseTablePrefix());
+        return Deity.data.getDB().tableName(getMySQLDatabaseTablePrefix(), "players");
     }
 
     public static String getMySQLWinnersTable() {
-        return Deity.server.getDB().tableName("winners", getMySQLDatabaseTablePrefix());
+        return Deity.data.getDB().tableName(getMySQLDatabaseTablePrefix(), "winners");
     }
 
     // /////////////////////
@@ -193,5 +193,9 @@ public class Settings {
 
     public static int getMaxTickets() {
         return getInt("lottery.MAX_TICKETS");
+    }
+    
+    public static String getChannelName() {
+        return getString("lottery.CHANNEL_NAME");
     }
 }

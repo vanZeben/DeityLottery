@@ -8,13 +8,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.imdeity.lottery.Lottery;
+import com.imdeity.deityapi.Deity;
+import com.imdeity.deityapi.exception.InvalidChannelException;
+import com.imdeity.deityapi.exception.InvalidFundsException;
+import com.imdeity.deityapi.exception.NegativeMoneyException;
 import com.imdeity.lottery.objects.LotteryObject;
 import com.imdeity.lottery.util.*;
-import com.imdeity.profile.Deity;
-import com.imdeity.profile.exception.InvalidChannelException;
-import com.imdeity.profile.exception.InvalidFundsException;
-import com.imdeity.profile.exception.NegativeMoneyException;
 
 public class LotteryCommand implements CommandExecutor {
 
@@ -28,6 +27,8 @@ public class LotteryCommand implements CommandExecutor {
                 "Buys one or [n] of lottery tickets."));
         output.add(ChatTools.formatCommand("", "/lottery", "winners",
                 "Gets past lottery winners."));
+        output.add(ChatTools.formatCommand("", "/lottery", "claim",
+                "Claim your recent winnings."));
     }
 
     @Override
@@ -35,7 +36,7 @@ public class LotteryCommand implements CommandExecutor {
             String commandLabel, String args[]) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (Lottery.permissions.has(player, "lottery.general")) {
+            if (Deity.perm.has(player, "lottery.general")) {
                 parseCommand(player, args);
                 return true;
             }
@@ -74,8 +75,9 @@ public class LotteryCommand implements CommandExecutor {
         } else if (split[0].equalsIgnoreCase("winners")
                 || split[0].equalsIgnoreCase("w")) {
             winnersCommand(player, split);
-        } else {
-
+        } else if (split[0].equalsIgnoreCase("claim")
+                || split[0].equalsIgnoreCase("c")){
+            LotteryObject.claimPrize(player);
         }
     }
 
@@ -110,14 +112,14 @@ public class LotteryCommand implements CommandExecutor {
 
         if (Deity.econ.canPay(player.getName(), money)) {
             for (int i = 0; i < numTicket; i++) {
-                Deity.server.getDB().Write(sql);
+                Deity.data.getDB().Write(sql);
             }
             if (numTicket == 1)
-                Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", player.getName() +" just bought " + numTicket + " Ticket!");
+                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", player.getName() +" just bought " + numTicket + " Ticket!");
             else
-                Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", player.getName() +" just bought " + numTicket + " Tickets!");
+                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", player.getName() +" just bought " + numTicket + " Tickets!");
             
-            Deity.chat.broadcastHerochatMessage("global", "ImDeityBot", "\'/lottery buy #\' to get in on the action yourself");
+            Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", "\'/lottery buy #\' to get in on the action yourself");
         } else {
             throw new InvalidFundsException();
         }
