@@ -115,11 +115,9 @@ public class LotteryCommand implements CommandExecutor {
                 Deity.data.getDB().Write(sql);
             }
             if (numTicket == 1)
-                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", player.getName() +" just bought " + numTicket + " Ticket!");
+                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "<gold>[Lottery] " + player.getName() +" just bought " + numTicket + " Ticket! <teal>/lottery");
             else
-                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", player.getName() +" just bought " + numTicket + " Tickets!");
-            
-            Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "ImDeityBot", "\'/lottery buy #\' to get in on the action yourself");
+                Deity.chat.broadcastHerochatMessage(Settings.getChannelName(), "<gold>[Lottery] " + player.getName() +" just bought " + numTicket + " Tickets! <teal>/lottery");
         } else {
             throw new InvalidFundsException();
         }
