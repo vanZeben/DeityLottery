@@ -1,6 +1,6 @@
 name: Lottery
 main: com.imdeity.lottery.Lottery
-version: 0.0.1
+version: 0.0.2
 author: vanZeben
 website: www.imdeity.com
 softdepend: [ImDeityProfile]
