@@ -49,15 +49,15 @@ public class LotteryCommand implements CommandExecutor {
 
 	public void parseCommand(Player player, String[] split) {
 		if (split.length == 0) {
-			List<String> out = new ArrayList<String>();
-			out.add("<option><gray>There is <yellow>" + LotteryObject.getPot()
-					+ ".00 " + "<gray>Dei in the current pot.");
-			out.add("<option><gray>You have <yellow>"
+			Deity.chat.sendPlayerMessage(player, "Lottery", "&8There is &e"
+					+ LotteryObject.getPot() + ".00 "
+					+ "&8Dei in the current pot.");
+			Deity.chat.sendPlayerMessage(player, "Lottery", "&8You have &e"
 					+ LotteryObject.getNumTickets(player.getName())
-					+ "<gray> Tickets.");
-			out.add("<option><yellow>Use /lottery ? for a list of commands.");
-			for (String o : out)
-				ChatTools.formatAndSend(o, "Lottery", player);
+					+ "&8 Tickets.");
+			Deity.chat.sendPlayerMessage(player, "Lottery",
+					"&eUse /lottery ? for a list of commands.");
+
 		} else if (split[0].equalsIgnoreCase("help")
 				|| split[0].equalsIgnoreCase("?")) {
 			for (String o : output)
@@ -124,16 +124,16 @@ public class LotteryCommand implements CommandExecutor {
 			for (int i = 0; i < numTicket; i++) {
 				Deity.data.getDB().Write(sql);
 			}
+			Deity.econ.send(player.getName(), money, "Lottery Tickets");
 			if (numTicket == 1)
 				Deity.chat.broadcastHerochatMessage(
 						Lottery.config.getString("lottery.channel_name"),
-						"<gold>[Lottery] " + player.getName() + " just bought "
-								+ numTicket + " Ticket! <teal>/lottery");
+						"&8[&c*Lottery*&8] &e" + player.getName() + " &fjust bought &e1 ticket! &3/lottery buy&f to get one yourself");
 			else
 				Deity.chat.broadcastHerochatMessage(
 						Lottery.config.getString("lottery.channel_name"),
-						"<gold>[Lottery] " + player.getName() + " just bought "
-								+ numTicket + " Tickets! <teal>/lottery");
+						"&8[&c*Lottery*&8] &e" + player.getName() + " &fjust bought &e"
+								+ numTicket + " tickets! &3/lottery buy&f to get one yourself");
 		} else {
 			throw new InvalidFundsException();
 		}

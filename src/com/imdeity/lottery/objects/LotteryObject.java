@@ -80,20 +80,20 @@ public class LotteryObject {
 								winner,
 								"You just won the daily lottery worth "
 										+ winnings
-										+ " Dei! Claim your winnings with <teal>/lottery claim");
+										+ " Dei! Claim your winnings with /lottery claim");
 				Deity.chat
 						.broadcastHerochatMessage(Lottery.config
 								.getString("lottery.channel_name"),
-								"<gold>[Lottery] Drawing the <yellow>ImDeity <gold>Daily Lottery...");
+								"&8[&c*Lottery*&8]&f Drawing the &cImDeity Daily Lottery...");
 				Deity.chat
 						.broadcastHerochatMessage(
 								Lottery.config
 										.getString("lottery.channel_name"),
-								"<gold>[Lottery] <green>"
+								"&8[&c*Lottery*&8] &a"
 										+ winner
-										+ " <gold>just won <green>"
+										+ "&f just won &a"
 										+ money
-										+ " <gold>dei in the daily Lottery! <teal>/lottery");
+										+ " &fdei in the daily Lottery! &3/lottery buy&f to buy your own");
 				System.out.println("[Lottery] "+winner+" won todays lottery");
 			} catch (InvalidChannelException e) {
 				e.printStackTrace();
@@ -122,11 +122,11 @@ public class LotteryObject {
 				e1.printStackTrace();
 			}
 			try {
-				if (Deity.econ.receive(player.getName(), winnings)) {
-					Deity.chat.sendPlayerMessage(player, "[*] ",
-							"<green>Thanks for playing in the lottery, "
+				if (Deity.econ.receive(player.getName(), winnings, "Lottery winnings")) {
+					Deity.chat.sendPlayerMessage(player, "&8[&c*&8] ",
+							"&bThanks for playing in the lottery, &3"
 									+ winnings
-									+ " Dei has been added to your account!");
+									+ " Dei &bhas been added to your account!");
 
 					sql = "UPDATE "
 							+ Deity.data.getDB().tableName("lottery_",
@@ -150,7 +150,7 @@ public class LotteryObject {
 				+ " ORDER BY `id` DESC LIMIT 10";
 
 		DatabaseResults query = Deity.data.getDB().Read2(sql);
-		for (int i = 0; i <= query.rowCount(); i++) {
+		for (int i = 0; i < query.rowCount(); i++) {
 			try {
 				out.add(ChatTools.formatUserList(
 						query.getString(i, "username"),
@@ -171,7 +171,7 @@ public class LotteryObject {
 
 		DatabaseResults query = Deity.data.getDB().Read2(sql);
 		if (query != null) {
-			for (int i = 1; i <= query.rowCount(); i++) {
+			for (int i = 0; i < query.rowCount(); i++) {
 				try {
 					if (query.getString(i, "username").equalsIgnoreCase(name)) {
 						return true;
