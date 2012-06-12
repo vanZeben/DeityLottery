@@ -1,0 +1,11 @@
+name: DeityLottery
+main: com.imdeity.lottery.Lottery
+version: 12.06.12
+author: vanZeben
+website: www.ImDeity.com
+softdepend: [DeityAPI]
+commands:
+  lottery:
+        aliases: []
+  lotteryadmin:
+        aliases: [la]
