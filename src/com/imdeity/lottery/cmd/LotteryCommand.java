@@ -43,9 +43,10 @@ public class LotteryCommand implements CommandExecutor {
 
     public void parseCommand(Player player, String[] split) {
         if (split.length == 0) {
-            Deity.chat.sendPlayerMessage(player, "Lottery", "&8There is &e" + LotteryObject.getPot() + ".00 " + "&8Dei in the current pot.");
-            Deity.chat.sendPlayerMessage(player, "Lottery", "&8You have &e" + LotteryObject.getNumTickets(player.getName()) + "&8 Tickets.");
-            Deity.chat.sendPlayerMessage(player, "Lottery", "&eUse /lottery ? for a list of commands.");
+            Deity.chat.sendPlayerMessage(player, "DeityLottery", "&8There is &e" + LotteryObject.getPot() + ".00" + " &8Dei in the current pot.");
+            Deity.chat.sendPlayerMessage(player, "DeityLottery", "&8You have &e" + LotteryObject.getNumTickets(player.getName()) + " &8Tickets.");
+            Deity.chat.sendPlayerMessage(player, "DeityLottery", "&8Tickets are &e" + Lottery.config.getInt("lottery.ticket_price") + " &8each.");
+            Deity.chat.sendPlayerMessage(player, "DeityLottery", "&eUse /lottery ? for a list of commands.");
 
         } else if (split[0].equalsIgnoreCase("help") || split[0].equalsIgnoreCase("?")) {
             for (String o : output)
@@ -96,8 +97,8 @@ public class LotteryCommand implements CommandExecutor {
                 Deity.data.getDB().Write(sql);
             }
             Deity.econ.send(player.getName(), money, "Lottery Tickets");
-            if (numTicket == 1) Deity.chat.sendMessageToAllOnline("Lottery", "&e" + player.getName() + " &fjust bought &e1 ticket! &3/lottery buy&f to get one yourself");
-            else Deity.chat.sendMessageToAllOnline("Lottery", "&e" + player.getName() + " &fjust bought &e" + numTicket + " tickets! &3/lottery buy&f to get one yourself");
+            if (numTicket == 1) Deity.chat.sendMessageToAllOnline("DeityLottery", "&e" + player.getName() + " &fjust bought &e1 ticket! &3/lottery buy&f to get one yourself");
+            else Deity.chat.sendMessageToAllOnline("DeityLottery", "&e" + player.getName() + " &fjust bought &e" + numTicket + " tickets! &3/lottery buy&f to get one yourself");
         } else {
             throw new InvalidFundsException();
         }
@@ -105,9 +106,9 @@ public class LotteryCommand implements CommandExecutor {
 
     public void winnersCommand(Player player, String[] split) {
         ArrayList<String> winners = LotteryObject.getWinners();
-        player.sendMessage(Deity.utils.chat.formatTitle("Lottery Winners"));
+        Deity.chat.sendPlayerMessageNoTitle(player, "&7----====&8[&5Lottery Winners&8]&7====----");
         for (String s : winners) {
-            Deity.chat.sendPlayerMessage(player, s);
+            Deity.chat.sendPlayerMessageNoTitle(player, s);
         }
 
     }

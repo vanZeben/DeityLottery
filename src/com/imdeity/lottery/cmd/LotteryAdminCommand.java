@@ -18,8 +18,6 @@ public class LotteryAdminCommand implements CommandExecutor {
 
     static {
         output.add(Deity.utils.chat.formatTitle("LotteryAdmin"));
-        // output.add(ChatTools.formatCommand("", "/lotteryadmin", "config",
-        // "Gives help on configuaration."));
         output.add(Deity.utils.chat.formatCommand("", "/lotteryadmin", "addtopot [n]", "Adds [n] to current pot."));
         output.add(Deity.utils.chat.formatCommand("", "/lotteryadmin", "removefrompot [n]", "Removes [n] to current pot."));
         output.add(Deity.utils.chat.formatCommand("", "/lotteryadmin", "draw", "Forces a draw."));
